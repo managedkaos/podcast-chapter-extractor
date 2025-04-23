@@ -17,7 +17,7 @@ help:
 	@echo "  test-container           - run the container with test_chapters.json"
 	@echo "  clean                    - clean up workspace and containers"
 
-all: requirements lint test build
+all: requirements lint test build test-container
 
 development-requirements: requirements
 	pip install --quiet --upgrade --requirement development-requirements.txt
