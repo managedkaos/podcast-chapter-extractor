@@ -27,34 +27,32 @@ requirements:
 	pip install --quiet --upgrade --requirement requirements.txt
 
 lint:
-	flake8 --ignore=E501,E231 *.py
-	pylint --errors-only --disable=C0301 *.py
-	black --diff *.py
-	isort --check-only --diff *.py
+	flake8 --ignore=E501,E231 *.py tests/*.py
+	pylint --errors-only --disable=C0301 *.py tests/*.py
+	black --diff *.py tests/*.py
+	isort --check-only --diff *.py tests/*.py
 
 fmt: black isort
 
 black:
-	black *.py
+	black *.py tests/*.py
 
 isort:
-	isort *.py
+	isort *.py tests/*.py
 
 test:
-	python -m unittest --verbose --failfast
+	python -m unittest discover -s tests -v --failfast
 
 build: lint test
 	docker build --tag $(APP):$(TAG) .
 
 test-container:
-	@echo "Running container with test_chapters.json..."
+	@echo "# Running container with test_chapters.json..."
 	@mkdir -p test_output
-	docker run --rm \
-		-v $(CURDIR)/test_chapters.json:/data/test_chapters.json \
-		-v $(CURDIR)/output:/data/test_output \
+	@docker run --rm \
+		-v $(CURDIR)/tests/test_chapters.json:/data/test_chapters.json \
+		-v $(CURDIR)/test_output:/data/test_output \
 		$(APP):$(TAG) /data/test_chapters.json --output /data/test_output/chapters.txt
-	@echo "\nOutput written to output/chapters.txt"
-	@cat output/chapters.txt
 
 clean:
 	docker container stop $(APP) || true
