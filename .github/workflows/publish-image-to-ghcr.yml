@@ -85,7 +85,7 @@ jobs:
             type=sha,format=long,prefix=,suffix=
             type=ref,event=branch,prefix=,suffix=
 
-      - name: Disply metadata
+      - name: Display metadata
         run: |
           cat ${{steps.meta.outputs.bake-file }}
 
