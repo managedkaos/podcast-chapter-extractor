@@ -14,6 +14,7 @@ help:
 	@echo "  isort                    - sort imports with isort"
 	@echo "  test                     - run unit tests"
 	@echo "  build                    - build docker container"
+	@echo "  test-container           - run the container with test_chapters.json"
 	@echo "  clean                    - clean up workspace and containers"
 
 all: requirements lint test build
@@ -45,10 +46,20 @@ test:
 build: lint test
 	docker build --tag $(APP):$(TAG) .
 
+test-container:
+	@echo "Running container with test_chapters.json..."
+	@mkdir -p test_output
+	docker run --rm \
+		-v $(CURDIR)/test_chapters.json:/data/test_chapters.json \
+		-v $(CURDIR)/output:/data/test_output \
+		$(APP):$(TAG) /data/test_chapters.json --output /data/test_output/chapters.txt
+	@echo "\nOutput written to output/chapters.txt"
+	@cat output/chapters.txt
+
 clean:
 	docker container stop $(APP) || true
 	docker container rm $(APP) || true
-	@rm -rf ./__pycache__ ./tests/__pycache__
+	@rm -rf ./__pycache__ ./tests/__pycache__ ./test_output
 	@rm -f .*~ *.pyc
 
-.PHONY: help requirements lint black isort test build clean development-requirements
+.PHONY: help requirements lint black isort test build clean development-requirements test-container
